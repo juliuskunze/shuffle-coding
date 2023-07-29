@@ -1,0 +1,34 @@
+name: Rust
+
+on:
+  push:
+    branches: [ "main", "dev" ]
+  pull_request:
+    branches: [ "main", "dev" ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+          default: true
+      - name: Build lib
+        run: cargo build --verbose
+      - name: Build experimental
+        run: cargo build --verbose --features experimental --verbose
+      - name: Build bench
+        run: cargo build --verbose --features bench --verbose
+      - name: Run tests
+        run: cargo test --verbose
+      - name: Run help
+        run: cargo run --release --features bench -- --help
+      - name: Run benchmark
+        run: cargo run --release --features bench -- --joint --ap SZIP --seeds 100 && cargo run --release --features bench -- --ar --ap SZIP --seeds 100
